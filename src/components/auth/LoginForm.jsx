@@ -14,9 +14,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { login } from '../../store/slices/authSlice';
 
 const schema = yup.object().shape({
-  email: yup.string().email().required(),
+  username: yup.string().required("Username is required"),
   password: yup.string().min(8).max(14).required(),
 });
 
@@ -33,7 +34,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    // dispatch(login(data, navigate));
+    dispatch(login(data, navigate));
   };
 
   return (
@@ -55,22 +56,22 @@ const LoginForm = () => {
             <StyleSubHeading>Admin Login</StyleSubHeading>
 
             <StyledFormGroup>
-              <StyledLabel htmlFor="email">
-                Email <StyledAsterisk className="text-alert">*</StyledAsterisk>
+              <StyledLabel htmlFor="username">
+              Username <StyledAsterisk className="text-alert">*</StyledAsterisk>
               </StyledLabel>
               <Controller
-                name="email"
+                name="username"
                 control={control}
                 defaultValue=""
                 render={({ field }) => (
                   <TextField
-                    type="email"
+                    type="text"
                     fullWidth
                     {...field}
-                    placeholder={"Enter Email here"}
+                    placeholder={"Enter Username here"}
                     size="small"
-                    error={!!errors.email}
-                    helperText={errors.email ? errors.email?.message : ""}
+                    error={!!errors.username}
+                    helperText={errors.username ? errors.username?.message : ""}
                     value={field.value}
                     sx={{
                       "& legend": { display: "none" },

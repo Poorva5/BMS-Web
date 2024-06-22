@@ -1,7 +1,13 @@
 import { Box } from "@mui/material";
 import HomeDrawer from "../components/home/Drawer";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  if (!localStorage.getItem("auth_token")) {
+    navigate("/login");
+  }
 
   return (
     <div>

@@ -10,51 +10,57 @@ import { StyledAppLogo, StyledLogoutButton } from "./StyledHome";
 import { textColor } from "../../common/colors";
 import Navbar from "./Navbar";
 import HomeContent from "./HomeContent";
-import { useNavigate } from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
-import PeopleIcon from "@mui/icons-material/People";
 import HotelContent from "./HotelsContent";
 import PackagesContent from "./PackagesContent";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import BedIcon from '@mui/icons-material/Bed';
+import BookingContent from "./BookingContent";
+import PackageOverViewContent from "./PackageOverview";
+import { useNavigate } from "react-router-dom";
 
 export default function HomeDrawer() {
   const [selectedContent, setSelectedContent] = useState("Dashboard");
-  const [selectedSubContent, setSelectedSubContent] = useState("");
+  const [selectedPackage, setSelectedPackage] = useState(null);
 
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
-//   const handleLogout = () => {
-//     localStorage.removeItem("auth_token");
-//     navigate("/login");
-//   };
+  const handleLogout = () => {
+    localStorage.removeItem("auth_token");
+    navigate("/login");
+  };
 
-const renderContent = () => {
+  const renderContent = () => {
+    if (selectedPackage) {
+      return <PackageOverViewContent singlePackage={selectedPackage} />;
+    }
     switch (selectedContent) {
       case "Dashboard":
         return <HomeContent />;
       case "Bookings":
-        switch (selectedSubContent) {
-          case "Packages":
-            return <PackagesContent />;
-          case "Hotels":
-            return <HotelContent />;
-          default:
-            return <PackagesContent />;
-        }
+        return <BookingContent />;
+      case "Packages":
+        return <PackagesContent  onSelectPackage={setSelectedPackage}/>;
+      case "Hotels":
+        return <HotelContent />;
       default:
         return <HomeContent />;
     }
-};
+  };
 
   const iconMapping = {
-    Dashboard: <HomeIcon sx={{ color: textColor.fonts }} />,
-    Bookings: <PeopleIcon sx={{ color: textColor.fonts }} />,
+    Dashboard: <DashboardIcon sx={{ color: textColor.fonts, fontSize: '15px' }} />,
+    Bookings: <EventAvailableIcon sx={{ color: textColor.fonts, fontSize: '15px'  }} />,
+    Packages: <Inventory2OutlinedIcon sx={{ color: textColor.fonts, fontSize: '15px'  }} />, 
+    Hotels: <BedIcon sx={{ color: textColor.fonts, fontSize: '15px'  }} />,
   };
 
   const DrawerList = (
-    <Box sx={{ width: 250, marginTop: "0px" }}>
+    <Box sx={{ marginTop: "0px" }}>
       <List>
         <StyledAppLogo>Intrepid</StyledAppLogo>
-        {["Dashboard", "Bookings"].map((text, index) => (
+        {["Dashboard", "Bookings", "Packages", "Hotels"].map((text) => (
           <ListItem
             key={text}
             disablePadding
@@ -66,18 +72,14 @@ const renderContent = () => {
             <ListItemButton
               onClick={() => {
                 setSelectedContent(text);
-                if (text !== "Bookings") {
-                  setSelectedSubContent("");
-                }
+                setSelectedPackage(null);
               }}
               sx={{
-                backgroundColor:
-                  selectedContent === text && selectedSubContent === ""
-                    ? textColor.moreLightGrey
-                    : "inherit",
-                borderRight: selectedContent === text && selectedSubContent === ""
-                    ? "5px solid red"
-                    : "none",
+                color: '#8383a9',
+                borderBottom: '1px solid #f4f4f9',
+                backgroundColor: selectedContent === text ? textColor.moreLightGrey : "inherit",
+                borderRight: selectedContent === text ? "5px solid red" : "none",
+                color: selectedContent === text ? textColor.black : "#8383a9"
               }}
             >
               <ListItemIcon>{iconMapping[text]}</ListItemIcon>
@@ -86,37 +88,8 @@ const renderContent = () => {
           </ListItem>
         ))}
 
-        {selectedContent === "Bookings" &&
-          ["Packages", "Hotels"].map((subText) => (
-            <ListItem
-              key={subText}
-              disablePadding
-              sx={{
-                color: textColor.black,
-                fontFamily: 'Quicksand", sans-serif !important',
-              }}
-            >
-              <ListItemButton
-                onClick={() => setSelectedSubContent(subText)}
-                sx={{
-                  paddingLeft: 4,
-                  backgroundColor:
-                    selectedSubContent === subText ? textColor.moreLightGrey : "inherit",
-                color:
-                    selectedSubContent === subText ? textColor.fonts : "inherit",
-                    
-                }}
-              >
-                <ListItemIcon>{iconMapping[subText]}</ListItemIcon>
-                <ListItemText primary={subText} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-
         <StyledLogoutButton>
-          <div style={{ cursor: "pointer" }}>
-            Logout
-          </div>
+          <div onClick={handleLogout} style={{ cursor: "pointer" }}>Logout</div>
         </StyledLogoutButton>
       </List>
     </Box>
@@ -138,21 +111,11 @@ const renderContent = () => {
       >
         {DrawerList}
       </Drawer>
-      <Box
-        component="main"
-        sx={{
-          bgcolor: "",
-          marginTop: "0px",
-        }}
-      >
-        <Box
-          sx={{ width: "100%", position: "fixed", bgColor: textColor.white }}
-        >
+      <Box component="main" sx={{ bgcolor: "", marginTop: "0px" }}>
+        <Box sx={{ width: "100%", position: "fixed", bgColor: textColor.white }}>
           <Navbar />
         </Box>
-        <Box sx={{ marginTop: "100px", minWidth: "100%" }}>
-          {renderContent()}
-        </Box>
+        <Box sx={{ marginTop: "100px", minWidth: "1130px" }}>{renderContent()}</Box>
       </Box>
     </Box>
   );
